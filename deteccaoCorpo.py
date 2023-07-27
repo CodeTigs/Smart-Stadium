@@ -20,17 +20,15 @@ while True:
 
     try:
         results = pose.process(frameRGB)
-        posePoints = results.pose_landmarks  # Changed from results.multi_pose_landmarks
+        posePoints = results.pose_landmarks  
         # print(posePoints)  # Uncomment this line to see the pose landmarks in the console
 
-        if posePoints:
-            mp_drawing.draw_landmarks(img, posePoints, mp_pose.POSE_CONNECTIONS)
-            for id, cord in enumerate(posePoints.landmark):
-                cx, cy = int(cord.x * w), int(cord.y * h)
-                cv2.putText(img, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+        mp_drawing.draw_landmarks(img, posePoints, mp_pose.POSE_CONNECTIONS)
+        for id, cord in enumerate(posePoints.landmark):
+            cx, cy = int(cord.x * w), int(cord.y * h)
+            cv2.putText(img, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-    except Exception as e:  # Avoid using a bare except clause, catch specific exceptions if possible
-        print("Exception:", e)
+    except:
         continue
 
     cv2.imshow('Image', img)

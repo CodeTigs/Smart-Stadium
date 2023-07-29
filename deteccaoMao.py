@@ -1,14 +1,30 @@
 import cv2
 import mediapipe as mp
-from math import sqrt
+from math import sqrt,atan2, degrees
 import time 
+import numpy as np
+class point:
+    def __init__(self,x,y,z):
+        self.x, self.y, self.z = x,y,z
+
+    def calculoDistancia(self,point):
+        return sqrt((self.x-point.x)**2 + (self.y-point.y)**2 + (self.z-point.z)**2)
+
+
+
+    def calculoAngulo(self, point):
+        dy = abs(point.y - self.y)
+        dxz = sqrt((self.x - point.x) ** 2 + (self.z - point.z) ** 2)
+        radian_angle = atan2(dy, dxz)
+        return degrees(radian_angle)
+
 
 video = cv2.VideoCapture(0)
 
 hands = mp.solutions.hands
 Hands = hands.Hands()
 mpDwaw = mp.solutions.drawing_utils
-beforex, beforey, beforez = 0.0,0.0,0.0
+before= point(0,0,0)
 distancia_total, velocidade = 0.0,0.0
 while True:
     success, img = video.read()
@@ -28,31 +44,27 @@ while True:
                 cv2.putText(img, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
                 #cv2.circle(img,(cx,cy),15,(0,255,0),cv2.FILLED)
                 if id == 0:
-                    xp0 = cord.x
-                    yp0 = cord.y
-                    zp0 = cord.z
+                    p0 = cord
                 elif id == 5:
-                    xp1 = cord.x
-                    yp1 = cord.y
-                    zp1 = cord.z
+                    p1 = cord
                 elif id == 17:
-                    newpx = (xp1 + cord.x + xp0)/3
-                    newpy = (yp1 + cord.y + yp0)/3
-                    newpz = zp0
-                    cv2.circle(img,(int(newpx *w), int(newpy*h)),4,(0,0,255),cv2.FILLED)
+                    newpoint = point(np.float32((p1.x + cord.x + p0.x)/3),
+                                     np.float32((p1.y + cord.y + p0.y)/3),
+                                     np.float32((p1.z + cord.z + p0.z)/3))
+                    
+                    cv2.circle(img,(int(newpoint.x * w), int(newpoint.y * h)),4,(0,0,255),cv2.FILLED)
 
-                    distancia = sqrt((newpx -beforex)**2 + (newpy-beforey)**2 + (newpz-beforez)**2)
-
+                    distancia = newpoint.calculoDistancia(before)
+                    angulo = newpoint.calculoAngulo(p0)
 
                     tempo_decorrido = time.time() - tempo_inicial
 
-                    beforex = newpx
-                    beforey = newpy
-                    beforez = newpz
+                    before = newpoint
+
                     if tempo_decorrido != 0:
                         velocidade = distancia/tempo_decorrido
                     cv2.putText(img,f"Velocidade: {velocidade:.2f} m/s",(0,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,0),5)
-
+                    cv2.putText(img,f"Angulo: {angulo:.2f} graus",(0,100),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,0),5)
                 pontos.append((cx,cy))
 #cv2.circle(img,(cx,cy),15,(0,255,0),cv2.FILLED)
 

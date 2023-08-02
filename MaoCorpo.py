@@ -47,16 +47,16 @@ while True:
         
         #processando maos
         results2 = hand.process(frameRGB)
-        handPoints = results2.multi_hand_landmarks
+        handPoints = results2.multi_hand_landmarks3
         if handPoints is not None:
             for points in handPoints:
                 mp_drawing.draw_landmarks(img, points,mp_hand.HAND_CONNECTIONS)
     except:
         continue
-
-    cv2.imshow('Image', img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    finally:
+        cv2.imshow('Image', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 video.release()
 cv2.destroyAllWindows()

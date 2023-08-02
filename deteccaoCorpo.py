@@ -1,11 +1,42 @@
 import cv2
 import mediapipe as mp
+from mediapipe.python.solutions.pose import PoseLandmark
+from mediapipe.python.solutions.drawing_utils import DrawingSpec
 
-
-# initialize Pose estimator
 mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
 
+custom_style = mp_drawing_styles.get_default_pose_landmarks_style()
+custom_connections = list(mp_pose.POSE_CONNECTIONS)
+
+excluded_landmarks = [
+    PoseLandmark.LEFT_EYE, 
+    PoseLandmark.RIGHT_EYE, 
+    PoseLandmark.LEFT_EYE_INNER, 
+    PoseLandmark.RIGHT_EYE_INNER, 
+    PoseLandmark.LEFT_EAR,
+    PoseLandmark.RIGHT_EAR,
+    PoseLandmark.LEFT_EYE_OUTER,
+    PoseLandmark.RIGHT_EYE_OUTER,
+    PoseLandmark.NOSE,
+    PoseLandmark.MOUTH_LEFT,
+    PoseLandmark.MOUTH_RIGHT,
+    PoseLandmark.RIGHT_PINKY,
+    PoseLandmark.RIGHT_INDEX,
+    PoseLandmark.RIGHT_THUMB,
+    PoseLandmark.LEFT_PINKY,
+    PoseLandmark.LEFT_INDEX,
+    PoseLandmark.LEFT_THUMB
+    ]
+
+for landmark in excluded_landmarks:
+    # we change the way the excluded landmarks are drawn
+    custom_style[landmark] = DrawingSpec(color=(255,255,0), thickness=None) 
+    # we remove all connections which contain these landmarks
+    custom_connections = [connection_tuple for connection_tuple in custom_connections 
+                            if landmark.value not in connection_tuple]
+    
 pose = mp_pose.Pose(
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5)
@@ -21,12 +52,16 @@ while True:
     try:
         results = pose.process(frameRGB)
         posePoints = results.pose_landmarks  
-        # print(posePoints)  # Uncomment this line to see the pose landmarks in the console
-
-        mp_drawing.draw_landmarks(img, posePoints, mp_pose.POSE_CONNECTIONS)
-        for id, cord in enumerate(posePoints.landmark):
-            cx, cy = int(cord.x * w), int(cord.y * h)
-            cv2.putText(img, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+        
+        #mp_drawing.draw_landmarks(img, posePoints, mp_pose.POSE_CONNECTIONS)
+        mp_drawing.draw_landmarks(
+            img,
+            results.pose_landmarks,
+            connections = custom_connections, #  passing the modified connections list
+            landmark_drawing_spec=custom_style) # and drawing style 
+        #for id, cord in enumerate(posePoints.landmark):
+            #cx, cy = int(cord.x * w), int(cord.y * h)
+            #cv2.putText(img, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
     except:
         continue

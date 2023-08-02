@@ -3,23 +3,24 @@ import mediapipe as mp
 from math import sqrt,atan2, degrees
 import time 
 import numpy as np
+
 class point:
-    def __init__(self,x,y,z):
-        self.x, self.y, self.z = x,y,z
+    def __init__(self,*arg):
+        if len(arg) == 3:
+            self.x, self.y, self.z = arg[0],arg[1],arg[2]
+        else:
+            self.x, self.y, self.z = np.float32(arg[0].x), np.float32(arg[0].y), np.float32(arg[0].z)
 
     def calculoDistancia(self,point):
         return sqrt((self.x-point.x)**2 + (self.y-point.y)**2 + (self.z-point.z)**2)
-
-
-
+    
     def calculoAngulo(self, point):
         dy = abs(point.y - self.y)
         dxz = sqrt((self.x - point.x) ** 2 + (self.z - point.z) ** 2)
         radian_angle = atan2(dy, dxz)
         return degrees(radian_angle)
 
-
-video = cv2.VideoCapture(0)
+video = cv2.VideoCapture(1)
 
 hands = mp.solutions.hands
 Hands = hands.Hands()
@@ -39,7 +40,6 @@ while True:
         for points in handPoints:
             mpDwaw.draw_landmarks(img, points,hands.HAND_CONNECTIONS)
             for id, cord in enumerate(points.landmark):
-
                 cx, cy = int(cord.x * w), int(cord.y * h)
                 cv2.putText(img, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
                 #cv2.circle(img,(cx,cy),15,(0,255,0),cv2.FILLED)

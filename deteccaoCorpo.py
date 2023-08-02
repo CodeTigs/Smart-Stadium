@@ -51,20 +51,29 @@ while True:
 
     try:
         results = pose.process(frameRGB)
-        posePoints = results.pose_landmarks  
-        
+        posePoints = results.pose_landmarks
+
+        #pegando pontos para futuramente calcular angulo e velocidade
+        #landMarks[PoseLandmark.RIGHT_SHOULDER.value].x
+        #landMarks = posePoints.landmark 
+
+        #captura convencional de pontos
         #mp_drawing.draw_landmarks(img, posePoints, mp_pose.POSE_CONNECTIONS)
+
         mp_drawing.draw_landmarks(
             img,
             results.pose_landmarks,
             connections = custom_connections, #  passing the modified connections list
-            landmark_drawing_spec=custom_style) # and drawing style 
+            landmark_drawing_spec=custom_style) # and drawing style
+
+        #numerando pontos 
         #for id, cord in enumerate(posePoints.landmark):
             #cx, cy = int(cord.x * w), int(cord.y * h)
             #cv2.putText(img, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
     except:
         continue
+
 
     cv2.imshow('Image', img)
     if cv2.waitKey(1) & 0xFF == ord('q'):

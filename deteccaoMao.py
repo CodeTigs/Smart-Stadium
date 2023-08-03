@@ -40,9 +40,9 @@ while True:
     if handPoints:
         for points in handPoints:
             mpDwaw.draw_landmarks(img, points,hands.HAND_CONNECTIONS)
-            landMarks1 = handPoints[0].landmark[0]#[HandLandmark.WRIST.value]
-            landMarks2 = handPoints[0].landmark[5]#[HandLandmark.INDEX_FINGER_MCP.value]
-            landMarks3 = handPoints[0].landmark[17]#[HandLandmark.PINKY_MCP.value]
+            landMarks1 = points.landmark[0]#[HandLandmark.WRIST.value]
+            landMarks2 = points.landmark[5]#[HandLandmark.INDEX_FINGER_MCP.value]
+            landMarks3 = points.landmark[17]#[HandLandmark.PINKY_MCP.value]
             newpoint = point(np.float32((landMarks1.x + landMarks2.x + landMarks3.x))/3,
                             np.float32((landMarks1.y + landMarks2.y + landMarks3.y))/3,
                             np.float32((landMarks1.z + landMarks2.z + landMarks3.z))/3)

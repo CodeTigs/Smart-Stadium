@@ -1,9 +1,9 @@
 import cv2
 import mediapipe as mp
-import time
-import numpy as np
+#import time
+#import numpy as np
 from math import sqrt,atan2, degrees
-from mediapipe.framework.formats import landmark_pb2
+#from mediapipe.framework.formats import landmark_pb2
 
 class point:
     def __init__(self,x,y,z):
@@ -21,12 +21,13 @@ class point:
 
 mp_pose = mp.solutions.pose
 mp_hand = mp.solutions.hands
-hand = mp_hand.Hands()
+
 mp_drawing = mp.solutions.drawing_utils
 
 pose = mp_pose.Pose(
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5)
+hand = mp_hand.Hands()
 
 video = cv2.VideoCapture(0)
 
@@ -39,24 +40,26 @@ while True:
     try:
         #processando corpo inteiro
         results = pose.process(frameRGB)
-        landmark_subset = landmark_pb2.NormalizedLandmarkList(landmark = results.pose_landmarks.landmark[11:])
         posePoints = results.pose_landmarks
         if posePoints is not None:
             mp_drawing.draw_landmarks(img, posePoints, mp_pose.POSE_CONNECTIONS)
             #mp_drawing.draw_landmarks(img,landmark_subset,mp_pose.POSE_CONNECTIONS)
-        
+    except:
+        pass
+
+    try:
         #processando maos
         results2 = hand.process(frameRGB)
-        handPoints = results2.multi_hand_landmarks3
+        handPoints = results2.multi_hand_landmarks
         if handPoints is not None:
             for points in handPoints:
                 mp_drawing.draw_landmarks(img, points,mp_hand.HAND_CONNECTIONS)
     except:
-        continue
-    finally:
-        cv2.imshow('Image', img)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        pass
+
+    cv2.imshow('Image', img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 video.release()
 cv2.destroyAllWindows()

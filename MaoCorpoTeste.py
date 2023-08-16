@@ -12,7 +12,7 @@ class point:
     def calculoDistancia(self, point):
         return sqrt((self.x - point.x) ** 2 + (self.y - point.y) ** 2 + (self.z - point.z) ** 2)
 
-    # Método para calcular o ângulo entre dois pontos no plano XZ em relacao ao plano Y
+    # Método para calcular o ângulo entre dois pontos no plano XZ em relacao ao eixo Y
     def calculoAngulo(self, point):
         dy = abs(point.y - self.y)
         dxz = sqrt((self.x - point.x) ** 2 + (self.z - point.z) ** 2)

@@ -1,5 +1,5 @@
 # Importação de bibliotecas
-import cv2
+import cv2 # Biblioteca para captura e processamento de imagem
 import mediapipe as mp  # Biblioteca para detecção de poses e mãos
 from math import sqrt, atan2, degrees  # Funções matemáticas
 
@@ -12,7 +12,7 @@ class point:
     def calculoDistancia(self, point):
         return sqrt((self.x - point.x) ** 2 + (self.y - point.y) ** 2 + (self.z - point.z) ** 2)
 
-    # Método para calcular o ângulo entre dois pontos no plano XY
+    # Método para calcular o ângulo entre dois pontos no plano XZ em relacao ao plano Y
     def calculoAngulo(self, point):
         dy = abs(point.y - self.y)
         dxz = sqrt((self.x - point.x) ** 2 + (self.z - point.z) ** 2)
@@ -20,15 +20,15 @@ class point:
         return degrees(radian_angle)
 
 # Configuração do mediapipe para detecção de poses e mãos
-mp_pose = mp.solutions.pose  # Módulo para detecção de poses corporais
-mp_hand = mp.solutions.hands  # Módulo para detecção de posições chave nas mãos
+mp_pose = mp.solutions.pose  # Módulo para detecção deo corpo
+mp_hand = mp.solutions.hands  # Módulo para detecção de mãos
 mp_drawing = mp.solutions.drawing_utils  # Utilidades para desenhar pontos e conexões nas imagens
 
-# Configuração dos modelos de detecção de poses e mãos
+# Configuração dos modelos de detecção de corpo e mãos
 pose = mp_pose.Pose(
-    min_detection_confidence=0.5,  # Limiar de confiança mínimo para detecção de poses
-    min_tracking_confidence=0.5)   # Limiar de confiança mínimo para o rastreamento de poses
-hand = mp_hand.Hands()  # Objeto para detecção de posições chave nas mãos
+    min_detection_confidence=0.5,  # Limiar de confiança mínimo para detecção do corpo
+    min_tracking_confidence=0.5)   # Limiar de confiança mínimo para o rastreamento do corpo
+hand = mp_hand.Hands()  # Objeto para detecção de mãos
 
 # Inicialização da câmera de vídeo
 video = cv2.VideoCapture(0)
@@ -41,17 +41,17 @@ while True:
     h, w, _ = img.shape  # Obter as dimensões da imagem
 
     try:
-        # Processamento de poses corporais
-        results = pose.process(frameRGB)  # Processar o quadro para detectar poses
-        posePoints = results.pose_landmarks  # Pontos chave da pose detectada
+        # Processamento de pontos no corpo
+        results = pose.process(frameRGB)  # Processar o quadro para detectar o corpo
+        posePoints = results.pose_landmarks  # Pontos chave do corpo detectado
         if posePoints is not None:
-            # Desenhar conexões entre os pontos chave da pose na imagem
+            # Desenhar conexões entre os pontos chave do corpo na imagem
             mp_drawing.draw_landmarks(img, posePoints, mp_pose.POSE_CONNECTIONS)
     except:
         pass
 
     try:
-        # Processamento de posições chave nas mãos
+        # Processamento de pontos nas mãos
         results2 = hand.process(frameRGB)  # Processar o quadro para detectar mãos
         handPoints = results2.multi_hand_landmarks  # Pontos chave nas mãos detectadas
         if handPoints is not None:
